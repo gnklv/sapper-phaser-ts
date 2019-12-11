@@ -7,8 +7,8 @@ enum Texts {
 }
 
 enum Styles {
-    Color = "#16a085",
-    Font = "Arial"
+    Font = "Arial",
+    Color = "#16a085"
 }
 
 export default class StartScene extends Phaser.Scene {

@@ -1,6 +1,6 @@
 import Board from "../models/Board";
 import Field from "../models/Field";
-import B = Phaser.Input.Keyboard.KeyCodes.B;
+import GameSceneView from "../views/GameSceneView";
 
 const Rows: number = 8;
 const Cols: number = 8;
@@ -9,6 +9,7 @@ const Bombs: number = 8;
 export default class GameScene extends Phaser.Scene {
     private _board: Board = null;
     private _flags: number = 0;
+    private _view: GameSceneView = null;
 
     constructor() {
         super("Game");
@@ -20,6 +21,8 @@ export default class GameScene extends Phaser.Scene {
         this._board = new Board(this, Rows, Cols, Bombs);
         this._board.on("left-click", this._onFieldClickLeft, this);
         this._board.on("right-click", this._onFieldClickRight, this);
+        this._view = new GameSceneView(this);
+        this._view.render({ flags: this._flags });
     }
 
     private _onFieldClickLeft(field: Field): void {
@@ -47,11 +50,13 @@ export default class GameScene extends Phaser.Scene {
         }
 
         this._flags = Bombs - this._board.countMarked;
+        this._view.render({ flags: this._flags });
     }
 
     private _onGameOver(status: boolean): void {
         this._board.off("left-click", this._onFieldClickLeft, this);
         this._board.off("right-click", this._onFieldClickRight, this);
         this._board.open();
+        this._view.render({ status });
     }
 }
