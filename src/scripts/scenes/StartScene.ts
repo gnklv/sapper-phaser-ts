@@ -7,7 +7,7 @@ enum Texts {
 }
 
 enum Styles {
-    Color = "#2c3e50",
+    Color = "#16a085",
     Font = "Arial"
 }
 
