@@ -27,8 +27,32 @@ export default class Board extends Phaser.Events.EventEmitter {
         return this._cols;
     }
 
+    public get completed(): boolean {
+        return this._fields.filter(field => field.completed).length === this._bombs;
+    }
+
+    public get countMarked(): number {
+        return this._fields.filter(field => field.marked).length;
+    }
+
     public getField(row: number, col: number): Field {
         return this._fields.find(field => field.row === row && field.col === col);
+    }
+
+    public openClosestFields(field: Field): void {
+        field.getClosestFields().forEach(item => {
+            if (item.closed) {
+                item.open();
+
+                if (item.empty) {
+                    this.openClosestFields(item);
+                }
+            }
+        });
+    }
+
+    public open(): void {
+        this._fields.forEach(field => field.open());
     }
 
     private _create(): void {
@@ -37,10 +61,20 @@ export default class Board extends Phaser.Events.EventEmitter {
         this._createValues();
     }
 
+    private _onFieldClick(field: Field, pointer: Phaser.Input.Pointer): void {
+        if (pointer.leftButtonDown()) {
+            this.emit("left-click", field);
+        } else if (pointer.rightButtonDown()) {
+            this.emit("right-click", field);
+        }
+    }
+
     private _createFields(): void {
         for (let row = 0; row < this._rows; row++) {
             for (let col = 0; col < this._cols; col++) {
-                this._fields.push(new Field(this._scene, this, row, col));
+                const field = new Field(this._scene, this, row, col);
+                field.view.on("pointerdown", this._onFieldClick.bind(this, field));
+                this._fields.push(field);
             }
         }
     }
